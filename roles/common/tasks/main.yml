@@ -1,0 +1,16 @@
+---
+- name: Typischerweise benötigte Pakete für alle Linuxinstallationen
+  apt:
+    name: "{{ packages }}"
+    update-cache: yes
+  vars:
+    packages:
+     - python-setuptools
+     - git
+     - curl
+     - wget
+     - zip
+     - unzip
+     - ntp 
+     - ntpdate
+     - apt-transport-https

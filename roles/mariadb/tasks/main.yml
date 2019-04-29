@@ -1,0 +1,45 @@
+---
+- name: Installiere MariaDB
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+     - mariadb-server
+     - mariadb-client
+     - python-mysqldb
+     - libmariadb-dev
+     
+- name: Generiere ein sicheres MySQL-root-Passwort
+  shell: openssl rand -base64 96 | tr -cd '[:alnum:]' | cut -c -24
+  register: mysql_root_password
+ 
+- name: Verbiete root login remotely
+  command: 'mysql -NBe "{{ item }}"'
+  with_items:
+    - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost')
+    - UPDATE mysql.user SET plugin='mysql_native_password' WHERE User='root';
+    - FLUSH PRIVILEGES;
+  changed_when: false
+  
+- name: Entferne alle anonymen Benutzer
+  mysql_user:
+    name: ''
+    host_all: yes
+    state: absent
+    
+- name: Update MySQL root password for localhost root account.
+  shell: >
+    mysql -NBe
+    'SET PASSWORD FOR "root"@"localhost" = PASSWORD("{{ mysql_root_password.stdout }}");'
+
+- name: Kopiere root .my.cnf mit Passwort
+  template:
+    src: user.my.cnf.j2
+    dest: "/root/.my.cnf"
+    owner: root
+    group: root
+    mode: 0600
+    
+- name: Remove MySQL test database.
+  mysql_db: "name='test' state=absent"
+  

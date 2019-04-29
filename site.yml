@@ -1,0 +1,14 @@
+---
+- name: Install owncloud
+  hosts: all
+  remote_user: root
+  gather_facts: False
+  pre_tasks:
+    - name: Install python for Ansible
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal python-setuptools)
+      register: output
+      changed_when: output.stdout != ""
+  roles:
+    - lamp
+    - letsencrypt
+    - owncloud

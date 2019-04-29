@@ -1,0 +1,25 @@
+---
+- name: installiere Let's Encrypt ppa repo
+  apt_repository:
+    repo: ppa:certbot/certbot
+
+- name: Installiere certbot
+  apt:
+    name: python-certbot-apache
+    update-cache: yes
+
+- name: Stoppe Apache vorruebergehend
+  service: 
+    name: apache2
+    state: stopped
+
+- name: Generiere cert fuer domain
+  shell: certbot certonly -n --standalone -d {{ domain_name }} -m erik@neubauer.nz --agree-tos
+
+- name: Aktiviere benoetigte Apache module
+  shell: a2enmod rewrite && a2enmod ssl
+
+- name: Starte Apache wieder
+  service: 
+    name: apache2
+    state: started

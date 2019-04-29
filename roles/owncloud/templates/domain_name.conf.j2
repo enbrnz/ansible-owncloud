@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+
+<VirtualHost *:80>
+    RewriteEngine on
+    ReWriteCond %{SERVER_PORT} !^443$
+    RewriteRule ^/(.*) https://%{HTTP_HOST}/$1 [NC,R,L]
+</VirtualHost>
+<VirtualHost *:443>
+    ServerName {{ domain_name }}
+    SSLEngine on
+    SSLCertificateFile /etc/letsencrypt/live/{{ domain_name }}/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/{{ domain_name }}/privkey.pem
+    DocumentRoot /var/www/html/owncloud
+    <Directory /var/www/html/owncloud>
+     AllowOverride All
+     Order allow,deny
+     Allow from all
+     DirectoryIndex /var/www/html/owncloud
+    </Directory>
+    <IfModule mod_headers.c>
+        Header always set Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"
+    </IfModule>
+</VirtualHost>
