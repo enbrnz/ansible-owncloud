@@ -4,32 +4,32 @@
     url: https://download.owncloud.org/community/owncloud-10.1.1.tar.bz2
     checksum: 'sha256:https://download.owncloud.org/community/owncloud-10.1.1.tar.bz2.sha256'
     dest: /root/owncloud-10.1.1.tar.bz2
-    
+
 - name: Entpacke Archiv
-  unarchive: 
+  unarchive:
     src: /root/owncloud-10.1.1.tar.bz2
     remote_src: yes
     dest: /var/www/html
     owner: www-data
     group: www-data
-  
+
 - name: Erstelle data Verzeichnis
   file:
     path: /var/www/html/data
     state: directory
     owner: www-data
     group: www-data
-    
+
 - name: Generiere ein neues Passwort
   shell: openssl rand -base64 96 | tr -cd '[:alnum:]' | cut -c -24
   register: mysql_password
- 
+
 - name: Erstelle eine neue Datenbank mit dem Namen 'ocloud'
   mysql_db:
     name: ocloud
     state: present
- 
-- name: Erstelle Datenbank und Benutzer 
+
+- name: Erstelle Datenbank und Benutzer
   mysql_user:
     name: 'ocdbuser'
     host: localhost
@@ -42,10 +42,10 @@
   register: oc_admin_pw
 
 - name: Gieb das Admin Passwort aus
-  debug: 
-    msg: "Speicher das folgende ownCloud-Password für Benutzer ocadmin im Keypass: {{ oc_admin_pw.stdout }}"
-  
-- name: Installiere owncloud mit occ 
+  debug:
+      msg: "Speicher das folgende ownCloud-Password für Benutzer ocadmin im Keypass: {{ oc_admin_pw.stdout }}"
+
+- name: Installiere owncloud mit occ
   shell: >
     sudo -u www-data \
     php ./occ \
@@ -65,11 +65,11 @@
   notify: restart apache2
 
 - name: Kopiere Virtual host von template
-  template: 
+  template:
     src: domain_name.conf.j2
     dest: /etc/apache2/sites-available/{{ domain_name }}.conf
     owner: root
-    group: root 
+    group: root
     mode: 0600
 
 - name: aktiviere Virtual host
@@ -77,10 +77,10 @@
   notify: restart apache2
 
 - name: deaktiviere default sites
-  shell: a2dissite 000-default 
+  shell: a2dissite 000-default
   notify: restart apache2
 
-- name: Installiere trusted domain fuer owncloud mit occ 
+- name: Installiere trusted domain fuer owncloud mit occ
   shell: >
     sudo -u www-data \
     php ./occ \

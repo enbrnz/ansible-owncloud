@@ -9,7 +9,7 @@
     update-cache: yes
 
 - name: Stoppe Apache vorruebergehend
-  service: 
+  service:
     name: apache2
     state: stopped
 
@@ -20,6 +20,6 @@
   shell: a2enmod rewrite && a2enmod ssl
 
 - name: Starte Apache wieder
-  service: 
+  service:
     name: apache2
     state: started

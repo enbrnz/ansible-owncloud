@@ -11,6 +11,6 @@
      - wget
      - zip
      - unzip
-     - ntp 
+     - ntp
      - ntpdate
      - apt-transport-https

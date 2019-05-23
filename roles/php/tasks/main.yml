@@ -2,7 +2,7 @@
 - name: Installiere ondrej/php repository
   apt_repository:
     repo: ppa:ondrej/php
-    
+
 - name: Installiere PHP Version 7.2
   apt:
     name: "{{ packages }}"
@@ -24,10 +24,10 @@
       - php7.2-zip
       - php-imagick
       - libapache2-mod-fcgid
-      
+
 - name: Aktiviere Apache Proxy module
   shell: a2enmod proxy && a2enmod proxy_fcgi
-     
+
 - name: Aktiviere Apache PHP-FPM Konfiguration
   shell: a2enconf php7.2-fpm
   notify: restart apache2
